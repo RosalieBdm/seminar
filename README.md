@@ -27,6 +27,8 @@ Cross platform
 
 Godot : 3Dgames
 
+cocos2D : C++
+
 Unity: more powerful
 
 - Demo:
