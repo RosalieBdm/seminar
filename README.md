@@ -9,3 +9,21 @@ Presentation is for a total of 15 minutes, 10 minutes presentation and 5 minutes
 - Are there other similar options? (for topics 1 - 3), for topic 4, how to avoid 
 - Demo
 - Conclusions.
+
+
+Introduction:
+[...]
+
+Who is using it :
+2D games 
+Cross platform 
+
+Similar options:
+Godot : 3Dgames
+Unity: more powerful
+
+Demo:
+[...]
+
+Conclusion:
+the best 
