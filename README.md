@@ -11,20 +11,26 @@ Presentation is for a total of 15 minutes, 10 minutes presentation and 5 minutes
 - Conclusions.
 
 
-Introduction:
+ - Introduction:
+
 [...]
 
-Who is using it :
+- Who is using it :
 
 2D games 
+
 Cross platform 
 
-Similar options:
+- Similar options:
+
 Godot : 3Dgames
+
 Unity: more powerful
 
-Demo:
+- Demo:
+
 [...]
 
-Conclusion:
+- Conclusion:
+
 the best 
