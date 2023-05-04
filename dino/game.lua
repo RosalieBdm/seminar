@@ -25,16 +25,14 @@ local jumpButton
 local lowerBound
 local hearts
 local restartButton
+local pauseButton
 local menuButton
 local highScoresButton
+local resumeButton
 
 local physics = require( "physics" )
 physics.start()
 physics.setGravity(0, 50)
-
---local test = display.newImageRect(frontGroup,"images/dino_sprite_resize.png",500,500 )
---test.x = display.contentCenterX
---test.y = display.contentCenterY
 
 local sheetOptionsDinoWalk = {
     frames =
@@ -210,9 +208,6 @@ local sequenceData = {
 
 }
 
---local tapText = display.newText(dino.x .. "," .. dino.y, display.contentCenterX, 20, native.systemFont, 40 )
---tapText:setFillColor( 0, 0, 0 )
-
 -- move the platform to the left
 local function movePlatform(event)
     --tapText.text = dino.x .. "," .. dino.y
@@ -271,9 +266,6 @@ local function leftButtonHandler(event)
     
 end 
 
-
-
-
 -- create a function to move the object right
 local function moveRight()
     dino.x = dino.x + 10
@@ -324,16 +316,26 @@ local function endGame()
     jumpButton:removeEventListener("tap", jumpButtonHandler)
     Runtime:removeEventListener("enterFrame", moveRight)
     Runtime:removeEventListener("enterFrame", moveLeft)
-    highScoresButton.alpha = 1
+
+    pauseButton.isVisible = false
+
+    highScoresButton.isVisible = true
     highScoresButton:addEventListener("tap", function(event)
         composer.gotoScene( "highscores" )
     end
     )
-    restartButton.alpha = 1
+    restartButton.isVisible = true
     restartButton:addEventListener("tap", function(event)
         composer.gotoScene( "game" )
     end
     )
+    
+
+    menuButton.isVisible = true
+    menuButton:addEventListener("tap", function(event) 
+        composer.gotoScene( "menu" )
+    end)
+
     composer.setVariable( "finalScore", score )
     timer.cancel( scoreTimer )
 end
@@ -424,6 +426,53 @@ local function gameLoop()
 	
 end
 
+
+function pauseGame()
+    physics.pause() -- pause physics engine
+    timer.pauseAll() -- pause all timers
+    transition.pause() -- pause all transitions
+    audio.pause() -- pause all audio
+    dino:pause()
+    Runtime:removeEventListener("enterFrame", movePlatform) -- remove the game loop listener
+    pauseButton.isVisible = false -- hide the pause button
+    resumeButton.isVisible = true -- show the resume button
+    highScoresButton.isVisible = true
+    highScoresButton:addEventListener("tap", function(event)
+        composer.gotoScene( "highscores" )
+    end
+    )
+    restartButton.isVisible = true
+    restartButton:addEventListener("tap", function(event)
+        composer.gotoScene( "game" )
+    end
+    )
+    resumeButton.isVisible = true
+    resumeButton:addEventListener("tap", resumeGame)
+
+    menuButton.isVisible = true
+    menuButton:addEventListener("tap", function(event) 
+        composer.gotoScene( "menu" )
+    end)
+
+end
+
+function resumeGame()
+    physics.start() -- resume physics engine
+    gameLoopTimer = timer.performWithDelay( 2000, gameLoop, 0 )
+    scoreTimer = timer.performWithDelay( 100, scoreLoop, 0 )
+    Runtime:addEventListener("enterFrame", movePlatform) 
+    dino:play()
+    transition.resume() -- resume all transitions
+    audio.resume() -- resume all audio
+    --Runtime:addEventListener("enterFrame", gameLoop) -- add the game loop listener
+    pauseButton.isVisible = true -- show the pause button
+    resumeButton.isVisible = false -- hide the resume button
+    restartButton.isVisible = false
+    menuButton.isVisible = false
+    highScoresButton.isVisible = false
+
+end
+
 local function scoreLoop()
     score = score +1
     scoreText.text = score
@@ -440,7 +489,7 @@ end
 
 
 function scene:create( event )
-
+    
 	local sceneGroup = self.view
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 
@@ -545,15 +594,22 @@ function scene:create( event )
     jumpButton.alpha = 0.8
 
     --add the hidden buttons 
-    restartButton = display.newText( uiGroup, "Restart", display.contentCenterX, 300, native.newFont( "font/pixel.ttf", 44 ) )
-    restartButton.alpha = 0
-    highScoresButton = display.newText( uiGroup, "Highscores", display.contentCenterX, 400, native.newFont( "font/pixel.ttf", 44 ) )
-    highScoresButton.alpha = 0
+    restartButton = display.newText( uiGroup, "Restart", display.contentCenterX, 350, native.newFont( "font/pixel.ttf", 44 ) )
+    restartButton.isVisible = false
+    highScoresButton = display.newText( uiGroup, "Highscores", display.contentCenterX, 550, native.newFont( "font/pixel.ttf", 44 ) )
+    highScoresButton.isVisible = false
+    menuButton = display.newText( uiGroup, "Menu", display.contentCenterX, 450, native.newFont( "font/pixel.ttf", 44 ) )
+    menuButton.isVisible = false
 
-    --add the menu button
-    menuButton = display.newText( uiGroup, "Menu", 920, 65, native.newFont( "font/pixel.ttf", 36 ) )
-    menuButton:setFillColor(1)
-    menuButton:addEventListener( "tap", gotoMenu )
+    --add the resume button
+    resumeButton = display.newText( uiGroup, "Resume", display.contentCenterX, 250, native.newFont( "font/pixel.ttf", 44 ) )
+    resumeButton.isVisible = false
+
+
+    --add the pause button
+    pauseButton = display.newText( uiGroup, "ii", 950, 65, native.newFont( "font/funky.ttf", 44 ) )
+    pauseButton:setFillColor(1)
+    pauseButton:addEventListener( "tap", pauseGame )
 
     --reset variables:
     dinoState = "walking"
