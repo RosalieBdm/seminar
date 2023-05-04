@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../../Code/dino"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"notebook.consolidatedRunButton": true
+	}
+}
