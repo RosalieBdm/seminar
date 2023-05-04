@@ -1,4 +1,3 @@
-
 local composer = require( "composer" )
 
 local scene = composer.newScene()
@@ -92,71 +91,6 @@ local sheetOptionsDinoWalk = {
             height = 188
         },
     }
-
-
-
-    --[[{
-        {   -- 1) walk 1
-            x = 0,
-            y = 2656,
-            width = 2016,
-            height = 1440
-        },
-        {   -- 2) walk 2
-            x = 2048,
-            y = 2688,
-            width = 2016,
-            height = 1408
-        },
-        {   -- 3) walk 3
-            x = 4096,
-            y = 2624,
-            width = 2016,
-            height = 1472
-        }, 
-        {   -- 4) wlak 4
-            x = 6144,
-            y = 2592,
-            width = 2016,
-            height = 1504
-        },
-        {   -- 5) walk 5
-            x = 8192,
-            y = 2624,
-            width = 2016,
-            height = 1472
-        },
-        {   -- 6) repos
-            x = 0,
-            y = 448,
-            width = 1568,
-            height = 1536
-        },
-        {   -- 7) mort1
-            x = 2048,
-            y = 0,
-            width = 1728,
-            height = 1984
-        },
-        {   -- 8) mort2
-            x = 4096,
-            y = 1344,
-            width = 1984,
-            height = 640
-        },
-        {   -- 9) saut
-            x = 6144,
-            y = 480,
-            width = 1632,
-            height = 1504
-        },
-    }
-    ]]
-    --width = 2048,
-    --height = 2048,
-    --numFrames = 9,
-    --sheetContentWidth = 18432,
-    --sheetContentHeight = 2048
 }
 
 sheetOptionsDinoWalk.frames[8].y = 66
@@ -304,8 +238,6 @@ local function jumpButtonHandler(event)
     end
 end
 
-
-
 local function endGame()
     dino:setSequence("dead") -- switch to "walk" animation sequence
     dino:play() -- start playing the animation
@@ -426,7 +358,6 @@ local function gameLoop()
 	
 end
 
-
 function pauseGame()
     physics.pause() -- pause physics engine
     timer.pauseAll() -- pause all timers
@@ -482,11 +413,9 @@ local function gotoMenu()
     composer.gotoScene( "menu" )
 end
 
-
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
-
 
 function scene:create( event )
     
@@ -605,7 +534,6 @@ function scene:create( event )
     resumeButton = display.newText( uiGroup, "Resume", display.contentCenterX, 250, native.newFont( "font/pixel.ttf", 44 ) )
     resumeButton.isVisible = false
 
-
     --add the pause button
     pauseButton = display.newText( uiGroup, "ii", 950, 65, native.newFont( "font/funky.ttf", 44 ) )
     pauseButton:setFillColor(1)
@@ -616,7 +544,6 @@ function scene:create( event )
     lives = 3
     score = 0
     asteroidsTable = {}
-
 
 end
 
@@ -651,7 +578,6 @@ function scene:show( event )
     end
 end
 
-
 -- hide()
 function scene:hide( event )
 
@@ -669,7 +595,6 @@ function scene:hide( event )
 	end
 end
 
-
 -- destroy()
 function scene:destroy( event )
     Runtime:removeEventListener("enterFrame", movePlatform)
@@ -677,7 +602,6 @@ function scene:destroy( event )
 	-- Code here runs prior to the removal of scene's view
 
 end
-
 
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners
@@ -689,7 +613,5 @@ scene:addEventListener( "destroy", scene )
 -- -----------------------------------------------------------------------------------
 
 return scene
-
-
 
 
