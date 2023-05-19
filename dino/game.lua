@@ -34,7 +34,7 @@ local eggState = false
 local leftButton
 local rightButton
 local jumpButton
-local restartButton
+--local restartButton
 local pauseButton
 local menuButton
 local highScoresButton
@@ -303,6 +303,20 @@ local function fly()
 
 end
 
+local function dropEgg()
+    if egg.xy < display.contentHeight then 
+        if eggState == false then 
+            if (egg.x > dino.x -10) or (egg.x < dino.x + 10) then        
+                eggState = true 
+                egg:setSequence("fall")
+            end         
+        else 
+            egg.y = egg.y +5
+        end 
+    end 
+end
+
+
 local function launchPterodactyl()
     pterodactyl.isVisible = true
     egg.isVisible = true
@@ -393,8 +407,9 @@ local function jump(event)
 end
 
 local function jumpButtonHandler(event) 
-    if (dinoState == "walking") then       
+    if (dinoState == "walking" or dinoState == "standing")  then       
         dinoState = "jumping"
+        Runtime:removeEventListener("enterFrame", dinoStanding)
         dino:setSequence("jump") -- switch to "jump" animation sequence
         dino:play() -- start playing the animation
         jump()
@@ -411,6 +426,7 @@ local function endGame()
     jumpButton:removeEventListener("tap", jumpButtonHandler)
     Runtime:removeEventListener("enterFrame", moveRight)
     Runtime:removeEventListener("enterFrame", moveLeft)
+    timer.cancel( asteroidLoopTimer )
 
     pauseButton.isVisible = false
 
@@ -419,11 +435,12 @@ local function endGame()
         composer.gotoScene( "highscores" )
     end
     )
+    --[[
     restartButton.isVisible = true
     restartButton:addEventListener("tap", function(event)
         composer.gotoScene( "game" )
     end
-    )
+    )]]
     
 
     menuButton.isVisible = true
@@ -450,8 +467,8 @@ local function onCollision( event )
             if (dinoState == "dead") then 
                 endGame()
             else 
-                dinoState = "standing"
-                dino:setSequence("stand") -- switch to "walk" animation sequence
+                dinoState = "walking"
+                dino:setSequence("walk") -- switch to "walk" animation sequence
                 dino:play() -- start playing the animation
             end
         elseif ( ( obj1.myName == "dino" and obj2.myName == "leftBound" ) or
@@ -480,7 +497,7 @@ local function onCollision( event )
                 else 
                     display.remove(obj2)
                 end 
-
+                Runtime:removeEventListener("enterFrame", dinoStanding)
                 dinoState = "damage"
                 for i = #asteroidsTable, 1, -1 do
                     if ( asteroidsTable[i] == obj1 or asteroidsTable[i] == obj2 ) then
@@ -541,14 +558,15 @@ local function gameLoop()
     if (lives == 0 ) then 
 
         stopAsteroid()
-        -- add a runtime listener to move the platform
+        -- remove a runtime listener to move the platform
         Runtime:removeEventListener("enterFrame", movePlatform)
+    --[[
     elseif (score > 100) then   
         if (gamePhase == "to_pterodactyl") then      
             launchPterodactyl()
         elseif (gamePhase == "asteroid") then 
             stopAsteroid()
-        end
+        end]]
     end
 
 end
@@ -563,6 +581,7 @@ function pauseGame()
     dino:pause()
     egg:pause()
     pterodactyl:pause()
+    Runtime:removeEventListener("enterFrame", dinoStanding)
     Runtime:removeEventListener("enterFrame", fly)
     Runtime:removeEventListener("enterFrame", movePlatform) -- remove the game loop listener
     pauseButton.isVisible = false -- hide the pause button
@@ -572,11 +591,12 @@ function pauseGame()
         composer.gotoScene( "highscores" )
     end
     )
+    --[[
     restartButton.isVisible = true
     restartButton:addEventListener("tap", function(event)
         composer.gotoScene( "game" )
     end
-    )
+    )]]
     resumeButton.isVisible = true
     resumeButton:addEventListener("tap", resumeGame)
 
@@ -591,6 +611,9 @@ function resumeGame()
     physics.start() -- resume physics engine
     timer.resume(gameLoopTimer)
     timer.resume(scoreTimer)
+    if (dinoState == "standing") then         
+        Runtime:addEventListener("enterFrame", dinoStanding)
+    end
     if (gamePhase == "asteroid") then 
         timer.resume(asteroidLoopTimer)
     elseif (gamePhase == "pterodactyl") then       
@@ -607,7 +630,7 @@ function resumeGame()
     --Runtime:addEventListener("enterFrame", gameLoop) -- add the game loop listener
     pauseButton.isVisible = true -- show the pause button
     resumeButton.isVisible = false -- hide the resume button
-    restartButton.isVisible = false
+    --restartButton.isVisible = false
     menuButton.isVisible = false
     highScoresButton.isVisible = false
 
@@ -659,7 +682,7 @@ function scene:create( event )
     dino.y = display.contentHeight - 350
     physics.addBody( dino, "dynamic", {radius=0, bounce=0 } )
     dino.myName = "dino"
-    
+    dinoState = "jumping"
     --create the pterodactyl
     pterodactyl = display.newSprite(mainGroup, sheetPterodactyl, sequenceDataPterodactyl)
     pterodactyl.xScale = 200/pterodactyl.contentWidth
@@ -749,15 +772,15 @@ function scene:create( event )
     jumpButton.alpha = 0.8
 
     --add the hidden buttons 
-    restartButton = display.newText( uiGroup, "Restart", display.contentCenterX, 350, native.newFont( "font/pixel.ttf", 44 ) )
-    restartButton.isVisible = false
+    --restartButton = display.newText( uiGroup, "Restart", display.contentCenterX, 350, native.newFont( "font/pixel.ttf", 44 ) )
+    --restartButton.isVisible = false
     highScoresButton = display.newText( uiGroup, "Highscores", display.contentCenterX, 550, native.newFont( "font/pixel.ttf", 44 ) )
     highScoresButton.isVisible = false
     menuButton = display.newText( uiGroup, "Menu", display.contentCenterX, 450, native.newFont( "font/pixel.ttf", 44 ) )
     menuButton.isVisible = false
 
     --add the resume button
-    resumeButton = display.newText( uiGroup, "Resume", display.contentCenterX, 250, native.newFont( "font/pixel.ttf", 44 ) )
+    resumeButton = display.newText( uiGroup, "Resume", display.contentCenterX, 350, native.newFont( "font/pixel.ttf", 44 ) )
     resumeButton.isVisible = false
 
     --add the pause button
@@ -766,7 +789,6 @@ function scene:create( event )
     pauseButton:addEventListener( "tap", pauseGame )
 
     --reset variables:
-    dinoState = "walking"
     lives = 3
     score = 0
     asteroidsTable = {}
